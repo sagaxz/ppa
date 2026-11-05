@@ -1,24 +1,30 @@
-// netlify/functions/salvar.js
-const { getStore } = require('@netlify/blobs');
+import { getStore } from '@netlify/blobs';
 
-exports.handler = async (event) => {
-  // Pega os dados que o formulário enviou
-  const dados = JSON.parse(event.body);
-  const { numero, cpf, rg, nome } = dados;
+export default async (req, context) => {
+  try {
+    // Recebe os campos p0, p1 e p2
+    const { p0, p1, p2 } = await req.json();
 
-  if (!numero || !cpf || !rg || !nome) {
-    return { statusCode: 400, body: 'Faltam dados obrigatórios.' };
+    // Se algum estiver vazio, avisa
+    if (!p0 || !p1 || !p2) {
+      return new Response(JSON.stringify({ mensagem: 'Faltam dados. Recebido: ' + JSON.stringify({p0, p1, p2}) }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Salva no banco do Netlify usando p2 (o número) como chave
+    const store = getStore('funcionarios');
+    await store.setJSON(p2, { p0, p1 });
+
+    return new Response(JSON.stringify({ mensagem: 'Dados salvos com sucesso!' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ mensagem: 'Erro no servidor: ' + error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
-
-  // Abre o "armário" (store) chamado 'funcionarios'
-  const store = getStore('funcionarios');
-
-  // Guarda os dados usando o número como chave
-  // O valor pode ser um objeto JSON
-  await store.setJSON(numero, { cpf, rg, nome });
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ mensagem: 'Dados salvos com sucesso!' })
-  };
 };
