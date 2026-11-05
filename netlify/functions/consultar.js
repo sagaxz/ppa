@@ -1,25 +1,18 @@
-// netlify/functions/consultar.js
-const { getStore } = require('@netlify/blobs');
+import { getStore } from '@netlify/blobs';
 
-exports.handler = async (event) => {
-  // Pega o número da URL (ex: /cd123 -> numero = "123")
-  const numero = event.queryStringParameters.numero;
-
-  if (!numero) {
-    return { statusCode: 400, body: 'Número do funcionário não informado.' };
-  }
+export default async (req, context) => {
+  const url = new URL(req.url);
+  const numero = url.searchParams.get('P0');
+  
+  if (!numero) return new Response('Número não informado.', { status: 400 });
 
   const store = getStore('funcionarios');
-  // Busca os dados guardados com essa chave
   const dados = await store.get(numero, { type: 'json' });
 
-  if (!dados) {
-    return { statusCode: 404, body: 'Funcionário não encontrado.' };
-  }
-
-  // Devolve os dados para a sua página
-  return {
-    statusCode: 200,
-    body: JSON.stringify(dados)
-  };
+  if (!dados) return new Response('Não encontrado.', { status: 404 });
+  
+  return new Response(JSON.stringify(dados), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  });
 };
