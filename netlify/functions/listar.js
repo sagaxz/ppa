@@ -2,20 +2,19 @@ import { getStore } from '@netlify/blobs';
 
 export default async (req, context) => {
   try {
-    const store = getStore('funcionarios');
+    const store = getStore('funcionarios_v2'); // Mesmo nome novo aqui
     
-    // Pega a lista de todas as chaves (números) salvas
+    // Pega a lista de todos os cadastros
     const { blobs } = await store.list();
     
     const listaCompleta = [];
     
-    // Para cada número, busca os dados (nome e email)
     for (const blob of blobs) {
       const dados = await store.get(blob.key, { type: 'json' });
       listaCompleta.push({
-        numero: blob.p0,
-        nome: dados.p1,
-        email: dados.p2
+        numero: blob.key,         // O número que o funcionário digitou
+        nome: dados.nome,         // O nome organizado
+        email: dados.email        // O email organizado
       });
     }
     
