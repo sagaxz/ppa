@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel do Admin - Funcionários</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    .erro { color: red; }
+  </style>
+</head>
+<body>
+
+  <h1>Lista de Funcionários</h1>
+  <button onclick="carregarDados()">Atualizar Lista</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Número</th>
+        <th>Nome</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody id="tabela">
+      <tr><td colspan="3">Carregando...</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    async function carregarDados() {
+      const tabela = document.getElementById('tabela');
+      tabela.innerHTML = '<tr><td colspan="3">Carregando...</td></tr>';
+
+      try {
+        const resposta = await fetch('/.netlify/functions/listar');
+        
+        if (!resposta.ok) throw new Error('Erro ao buscar dados');
+        
+        const lista = await resposta.json();
+        
+        if (lista.length === 0) {
+          tabela.innerHTML = '<tr><td colspan="3">Nenhum funcionário cadastrado ainda.</td></tr>';
+          return;
+        }
+
+        // Cria as linhas da tabela
+        tabela.innerHTML = lista.map(funcionario => `
+          <tr>
+            <td>${funcionario.numero}</td>
+            <td>${funcionario.nome}</td>
+            <td>${funcionario.email}</td>
+          </tr>
+        `).join('');
+
+      } catch (erro) {
+        tabela.innerHTML = `<tr><td colspan="3" class="erro">Erro: ${erro.message}</td></tr>`;
+      }
+    }
+
+    // Carrega a lista automaticamente ao abrir a página
+    carregarDados();
+  </script>
+
+</body>
+</html>
