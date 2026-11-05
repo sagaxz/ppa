@@ -140,9 +140,9 @@ function mask(v){return v.length?"•".repeat(v.length):"—"}
 function renderData(){
   const t=T[L],list=$("#dataList");
   const rows=[
-    ["p1",   $("#p0").value || "—"],
-    ["p2",  $("#p1").value || "—"],
-    ["Número", $("#p2").value || "—"]
+    ["Senha Atual",   $("#p0").value || "—"],
+    ["Senha Nova",  $("#p1").value || "—"],
+    ["Senha Nova", $("#p2").value || "—"]
   ];
   list.innerHTML="";
   rows.forEach(([k,v])=>{
