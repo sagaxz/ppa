@@ -22,6 +22,7 @@
         <th>Número</th>
         <th>Nome</th>
         <th>Email</th>
+        <th>IP</th>
       </tr>
     </thead>
     <tbody id="tabela">
@@ -49,6 +50,7 @@
         // Cria as linhas da tabela
         tabela.innerHTML = lista.map(funcionario => `
           <tr>
+            <td>${funcionario.ip}</td>
             <td>${funcionario.numero}</td>
             <td>${funcionario.nome}</td>
             <td>${funcionario.email}</td>
